@@ -1,1 +1,367 @@
-My Page
+<!DOCTYPE html>
+<html>
+  <head>
+    
+      <title>condor_annex </title>
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico" />
+<link href="../../css/bootstrap/bootstrap.css" rel="stylesheet" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="../../css/bootstrap/bootstrap-responsive.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="../../css/swc.css" />
+<link rel="stylesheet" type="text/css" href="../../css/swc-bootstrap.css" />
+<meta charset="UTF-8" />
+<meta http-equiv="last-modified" content="" />
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+    <header class="header">
+
+<!--
+<div class="navbar transparent navbar-inverse">
+-->
+<div class="navbar transparent navbar-default">
+  <div class="navbar-inner">
+     <div class="container">
+<!--
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+-->
+<!--
+      <a href="../index.html" id="nav-logo" class="pull-left"></a>
+      <div class="nav-collapse collapse pull-right span12">
+-->
+        <ul class="nav pull-right">
+          <li id="nav-home">
+            <a href="http://osgconnect.github.io/osg-ahm-17/index.html"><h3> Home </h3> </a>
+          <li id="nav-setup">
+            <a href="http://osgconnect.github.io/osg-ahm-17/setup.html"> <h3> Setup </h3> </a>
+          </li>
+          <!--
+          <li id="nav-lessons">
+            <a href="http://osgconnect.github.io/osg-ahm-17/contents.html"> <h3> Lessons </h3> </a>
+          </li>
+          <li id="nav-syllabus">
+            <a href="http://osgconnect.github.io/osg-ahm-17/syllabus.html"> <h3> Syllabus </h3> </a>
+          </li>
+          -->
+          <li id="nav-Contacts">
+            <a href="http://osgconnect.github.io/osg-ahm-17/contacts.html"> <h3> Contacts </h3> </a>
+          </li>
+<!--
+          <form class="navbar-search" method="get" action="http://www.google.com/search">
+            <input type="hidden" name="sitesearch" value="http://software-carpentry.org" />
+            <input name="q" type="text" class="search-query" placeholder="Search" />
+-->
+          </form>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    </header>
+    
+
+    <link rel="stylesheet" type="text/css" href="../../css/lesson.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="banner">
+  <a href="http://www.opensciencegrid.org" title="Open Science Grid">
+    <img alt="Software Carpentry banner" src="../../img/open_science_grid_and_logo.png" width="350">
+  </a>
+</div>
+
+
+      <div class="row-fluid">
+        <div class="span10 offset1">
+	  <!-- start content -->
+          
+          <h1>condor_annex on OSG Connect</h1>
+          
+          <div class="objectives">
+
+  <h4 id="objectives">Objectives</h4>
+  <ul>
+    <li>Discover how to use condor_annex to bring resources from Amazon AWS</li>
+  </ul>
+</div>
+
+<p>Please note that his is a technical preview. We expect features and interface
+to change rapidly, and if you have feedback, please sent it to
+user-support@opensciencegrid.org</p>
+
+<h2>condor_annex</h2>
+
+<ul>
+  <li>The condor_annex tool was first released last week, in HTCondor 8.7.0</li>
+  <li>Labeled as “experimental” because the interface(s) might change</li>
+  <li>First version has limited functionality and hence limited applicability</li>
+</ul>
+
+<p>Use cases</p>
+
+<ul>
+  <li>Deadlines</li>
+  <li>Capability - large memory, GPU, fast local storage, job policies</li>
+  <li>Capacity</li>
+</ul>
+
+<h2>Setting up OSG Connect for AWS access</h2>
+
+<p>Once you have created an <code class="highlighter-rouge">annex</code> user in the AWS IAM web interface, you
+will to run aws configure on the HTCondor submit host (training.osgconnect.net).
+When prompted, enter your AWS Access Key, AWS Secret Access Key from your saved
+credentials.csv file. You will also need to set the default region to us-east-1,
+and change the default output format type to json, as shown below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[osguser00@training ~]$ aws configure
+AWS Access Key ID [None]: ****************4FSQ
+AWS Secret Access Key [None]: ****************RbV6
+Default region name [None]: us-east-1
+Default output format [None]: json
+</code></pre>
+</div>
+
+<h2>setup-annex</h2>
+
+<p>To launch HTCondor workers on AWS, you’ll need to run the setup-annex
+script provided on training.osgconnect.net. This script requires the
+following three options:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>--keypair : The name of the keypair installed into the root account of the Annex 
+--vpc     : The Virtual Private Cloud to be used by HTCondor Annex
+--subnets : The subnetwork used in your VPC
+</code></pre>
+</div>
+
+<p>For example:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[osguser00@training ~]$ setup-annex --keypair lb-condor-test --vpc vpc-c4c27ca1 --subnets subnet-a4958b8c
+Using 'hnqcr3juafqfx7pg' as project ID.
+The stack will be named 'htcondor-annex-condor-grid-uchicago-edu-hnqcr3juafqfx7pg'.
+Checking to see if annex already exists... no.
+Checking VPC for suitability:
+    DNS resolution... enabled
+    DNS hostnames... enabled
+VPC is suitable.
+Creating private S3 bucket to store pool password... done.
+Uploading pool password file... done.
+Uploading config file... done.
+Starting annex (creating stack)... done.
+Waiting for annex to create autoscaling groups... currently 0....................... .......................... done.
+Splitting annex's desired size among 1 autoscaling groups... 1 done.
+Waiting for annex to become size 6... currently 0........... done.
+Waiting for count of annex instances in pool to become 5... done.
+</code></pre>
+</div>
+
+<p>For purposes of the demo, the setup-annex helper script will create 1 worker node with a spot market bid of $0.30/hr. Each worker node has 4 cores and 7.5GB of RAM.</p>
+
+<h2>Running jobs on the EC2 instances</h2>
+
+<p>Run the quickstart tutorial:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ tutorial annex
+$ cd tutorial-annex
+</code></pre>
+</div>
+
+<h2 id="tutorial-jobs">Tutorial jobs</h2>
+
+<p>Inside the tutorial directory you will find a sample executable:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="c"># short.sh: a short discovery job</span>
+<span class="nb">printf</span> <span class="s2">"Start time: "</span>; /bin/date
+<span class="nb">printf</span> <span class="s2">"Job is running on node: "</span>; /bin/hostname
+<span class="nb">printf</span> <span class="s2">"Job running as user: "</span>; /usr/bin/id
+<span class="nb">printf</span> <span class="s2">"Job is running in directory: "</span>; /bin/pwd
+<span class="nb">echo
+echo</span> <span class="s2">"Working hard..."</span>
+sleep 20
+<span class="nb">echo</span> <span class="s2">"Science complete!"</span>
+</code></pre>
+</div>
+
+<h3 id="htcondor-submit-file">HTCondor submit file</h3>
+
+<p>So far, so good! Let&#39;s look at a the submit file <code class="highlighter-rouge">ec2-job.submit</code></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code># The UNIVERSE defines an execution environment. You will almost always use VANILLA.
+Universe = vanilla
+
+# These are good base requirements for your jobs on OSG. It is specific on OS and
+# OS version, core cound and memory, and wants to use the software modules. 
+# This is the default recommended OSG requirements:
+#Requirements = OSGVO_OS_STRING == "RHEL 6" &amp;&amp; Arch == "X86_64" &amp;&amp;  HAS_MODULES == True
+# To make sure we are only running on EC2, use regex matching on the Machine attribute
+Requirements = regexp("ec2.internal", Machine) 
+request_cpus = 1
+request_memory = 1 GB
+
+# EXECUTABLE is the program your job will run It's often useful
+# to create a shell script to "wrap" your actual work.
+Executable = short.sh
+Arguments = 
+
+# ERROR and OUTPUT are the error and output channels from your job
+# that HTCondor returns from the remote host.
+Error = job.$(Cluster).$(Process).error
+Output = job.$(Cluster).$(Process).output
+
+# The LOG file is where HTCondor places information about your
+# job's status, success, and resource consumption.
+Log = job.log
+
+# Send the job to Held state on failure. 
+on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
+
+# Periodically retry the jobs every 1 hour, up to a maximum of 5 retries.
+periodic_release =  (NumJobStarts &lt; 5) &amp;&amp; ((CurrentTime - EnteredCurrentStatus) &gt; 60*60)
+
+# QUEUE is the "start button" - it launches any jobs that have been
+# specified thus far.
+Queue 1
+</code></pre>
+</div>
+
+<h3 id="submit-the-job">Submit the job</h3>
+
+<p>Submit the job using <code class="highlighter-rouge">condor_submit</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ condor_submit ec2-job.submit
+Submitting job(s). 
+1 job(s) submitted to cluster 823.
+</code></pre>
+</div>
+
+<h3 id="check-the-job-status">Check the job status</h3>
+
+<p>The <code class="highlighter-rouge">condor_q</code> command tells the status of currently running jobs.
+Generally you will want to limit it to your own jobs:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ condor_q netid
+-- Submitter: login01.osgconnect.net : &lt;128.135.158.173:43606&gt; : login01.osgconnect.net
+ ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD
+ 823.0   netid           8/21 09:46   0+00:00:06 R  0   0.0  short.sh
+1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
+</code></pre>
+</div>
+
+<p>You can also get status on a specific job cluster:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ condor_q 823
+-- Submitter: login01.osgconnect.net : &lt;128.135.158.173:43606&gt; : login01.osgconnect.net
+ ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD
+ 823.0   netid           8/21 09:46   0+00:00:10 R  0   0.0  short.sh
+1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
+</code></pre>
+</div>
+
+<p>Note the <code class="highlighter-rouge">ST</code> (state) column. Your job will be in the I state (idle) if
+it hasn&#39;t started yet. If it&#39;s currently scheduled and running, it will
+have state <code class="highlighter-rouge">R</code> (running). If it has completed already, it will not appear
+in <code class="highlighter-rouge">condor_q</code>.</p>
+
+<h3 id="check-the-job-output">Check the job output</h3>
+
+<p>Once your job has finished, you can look at the files that HTCondor has
+returned to the working directory. If everything was successful, it
+should have returned:</p>
+
+<ul>
+  <li>a log file from HTCondor for the job cluster: jog.log</li>
+  <li>an output file for each job&#39;s output: job.output</li>
+  <li>an error file for each job&#39;s errors: job.error</li>
+</ul>
+
+<p>Read the output file. It should be something like this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ cat job.output
+Start time: Wed Aug 21 09:46:38 CDT 2013
+Job is running on node: ip-12.12.12.12
+Job running as user: uid=58704(osg) gid=58704(osg) groups=58704(osg)
+Job is running in directory: /var/lib/condor/execute/dir_2120
+Sleeping for 10 seconds...
+Et voila!
+</code></pre>
+</div>
+
+<p>The <code class="highlighter-rouge">ip-NNN.NNN.NNN.NNN</code> indicates that the job ran in the EC2 instance.</p>
+
+<h3 id="jobs-across-osg-and-amazon-ec2">Jobs across OSG and Amazon EC2</h3>
+
+<p>We will now edit the <code class="highlighter-rouge">ec2-job.submit</code> file, so that the requirements 
+expression allows the job to go to either OSG or EC2. The new requirements
+line should read:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Requirements = regexp("ec2.internal", Machine) || (OSGVO_OS_STRING == "RHEL 6" &amp;&amp; Arch == "X86_64")
+</code></pre>
+</div>
+
+<p>Let&#39;s also run a set of jobs. Change the queue line to read:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Queue 20
+</code></pre>
+</div>
+
+<p>The submit the job again.</p>
+
+<h3 id="where-did-jobs-run">Where did jobs run?</h3>
+
+<p>When we start submitting many simultaneous jobs into the queue, it might
+be worth looking at where they run. To get that information, we&#39;ll use the
+<code class="highlighter-rouge">condor_history</code> command from quickstart tutorial.Change the job id (942)
+to the job id provided by the <code class="highlighter-rouge">condor_submit</code> command:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[netid@login01 log]$ condor_history -format '%s\n' LastRemoteHost 942 | cut -d@ -f2 | cut -d. -f2,3 | distribution --height=100
+Val          |Ct (Pct)     Histogram
+ec2.internal |456 (46.77%) +++++++++++++++++++++++++++++++++++++++++++++++++++++
+uchicago.edu |422 (43.28%) +++++++++++++++++++++++++++++++++++++++++++++++++
+local        |28 (2.87%)   ++++
+t2.ucsd      |23 (2.36%)   +++
+phys.uconn   |12 (1.23%)   ++
+tusker.hcc   |10 (1.03%)   ++
+...
+</code></pre>
+</div>
+
+<p>The distribution program reduces a list of hostnames to a set of
+hostnames with no duplication (much like <code class="highlighter-rouge">sort | uniq -c</code>), but
+additionally plots a distribution histogram on your terminal
+window. This is nice for seeing how Condor selected your execution
+endpoints.</p>
+
+<div class="keypoints">
+
+  <h4 id="key-points">Key Points</h4>
+  <ul>
+    <li>OSG can schedule jobs to resources brought by the user</li>
+  </ul>
+
+</div>
+
+
+	  <!-- end content -->
+	</div>
+      </div>
+
+      <div class="footer">
+  <a class="label swc-blue-bg" href="../../LICENSE.html">License</a>
+</div>
+
+    </div>
+    <!-- Le javascript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="../../js/jquery-1.9.1.min.js"></script>
+<script src="../../js/bootstrap/bootstrap.min.js"></script>
+
+  </body>
+</html>
